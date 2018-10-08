@@ -10,4 +10,8 @@ public class Roll {
         this.first = Objects.requireNonNull(first);
         this.second = Objects.requireNonNull(second);
     }
+
+    public static Roll generate() {
+        return new Roll((int)Math.round(Math.random() * 5 + 1), (int)Math.round(Math.random() * 5 + 1));
+    }
 }

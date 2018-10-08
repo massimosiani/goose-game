@@ -1,18 +1,20 @@
 package io.github.massimosiani.goosegame.domain;
 
-import io.github.massimosiani.goosegame.utils.SquareUtils;
+import io.github.massimosiani.goosegame.domain.square.BouncedSquareFilter;
+import io.github.massimosiani.goosegame.domain.square.CommonSquare;
+import io.github.massimosiani.goosegame.domain.square.StartSquare;
+import io.github.massimosiani.goosegame.domain.square.WinSquare;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Game {
-    private final Integer gameLength;
+    private Board board;
+    private boolean finished = false;
     private List<Player> players = new ArrayList<>();
 
     public Game(int gameLength) {
-        this.gameLength = gameLength;
+        board = new Board(gameLength);
     }
 
     public Game addPlayer(Player player) {
@@ -27,31 +29,47 @@ public class Game {
         return new ArrayList<>(players);
     }
 
+    public boolean isFinished() {
+        return finished;
+    }
+
     public PlayerMove move(Player player, Roll roll) {
         if (!players.contains(player))
             throw new IllegalArgumentException("Player not found: " + player.getName());
-        var newPlayerPosition = SquareUtils.computeNewSquare(players.get(players.indexOf(player)), roll, gameLength);
-        player.setCurrentPosition(newPlayerPosition.square);
-        newPlayerPosition.won = newPlayerPosition.square == gameLength;
-        return newPlayerPosition;
+        PlayerMove playerMove = PlayerMove.of(player);
+        do {
+            playerMove.merge(player.move(roll));
+            BouncedSquareFilter.apply(board, playerMove, roll);
+            player.setCurrentSquare(board.getSquares().get(playerMove.getSquare()));
+            if (player.getCurrentSquare() instanceof WinSquare) finished = true;
+        } while (!(player.getCurrentSquare() instanceof CommonSquare) && !finished);
+        return playerMove;
     }
 
     public Game start() {
-        players.forEach(p -> p.setCurrentPosition(0));
+        players.forEach(p -> p.setCurrentSquare(new StartSquare(0)));
         return this;
     }
 
     public static class PlayerMove {
-        public final boolean bounced;
-        public final boolean bridged;
         private List<Integer> moves = new ArrayList<>();
-        public final int square;
-        private boolean won;
+        private Player player;
 
-        public PlayerMove(boolean bounced, boolean bridged, int square) {
-            this.bounced = bounced;
-            this.bridged = bridged;
-            this.square = square;
+        private PlayerMove(Player player) {
+            this.player = player;
+        }
+
+        public static PlayerMove of(Player player) {
+            return new PlayerMove(player);
+        }
+
+        public static PlayerMove of(Player player, Integer square) {
+            return new PlayerMove(player).addMove(square);
+        }
+
+        public PlayerMove merge(PlayerMove playerMove) {
+            this.moves.addAll(playerMove.moves);
+            return this;
         }
 
         public PlayerMove addMove(Integer square) {
@@ -63,8 +81,12 @@ public class Game {
             return moves;
         }
 
-        public boolean hasWon() {
-            return won;
+        public Player getPlayer() {
+            return player;
+        }
+
+        public int getSquare() {
+            return moves.get(moves.size() - 1);
         }
     }
 }

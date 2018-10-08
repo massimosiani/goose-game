@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Player {
     private final String name;
 
-    private int currentPosition = 0;
+    private Square currentSquare;
 
     public Player(String name) {
         this.name = Objects.requireNonNull(name);
@@ -15,18 +15,22 @@ public class Player {
         return name;
     }
 
-    public int getCurrentPosition() {
-        return currentPosition;
+    public Square getCurrentSquare() {
+        return currentSquare;
     }
 
-    public Player setCurrentPosition(int currentPosition) {
-        this.currentPosition = currentPosition;
+    public Player setCurrentSquare(Square currentSquare) {
+        this.currentSquare = currentSquare;
         return this;
+    }
+
+    public Game.PlayerMove move(Roll roll) {
+        return currentSquare.move(this, roll);
     }
 
     @Override
     public String toString() {
-        return "Player={name=" + name + ", currentPosition=" + currentPosition + "}";
+        return "Player={name=" + name + ", currentSquare=" + (currentSquare != null ? currentSquare.toString() : "null") + "}";
     }
 
     @Override

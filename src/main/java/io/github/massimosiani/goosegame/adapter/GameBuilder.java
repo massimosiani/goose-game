@@ -3,6 +3,8 @@ package io.github.massimosiani.goosegame.adapter;
 import io.github.massimosiani.goosegame.domain.Game;
 import io.github.massimosiani.goosegame.domain.Player;
 
+import java.util.List;
+
 public class GameBuilder {
     private Game game = new Game(63);
 
@@ -11,11 +13,11 @@ public class GameBuilder {
         return this;
     }
 
-    public Game start() {
-        return game.start();
+    public List<Player> getPlayers() {
+        return game.getPlayers();
     }
 
-    public Game toGame() {
-        return game;
+    public Game start() {
+        return game.start();
     }
 }

@@ -12,8 +12,8 @@ public class GameTest {
     public void cannotAddTheSamePlayer() {
         var gameBuilder = new GameBuilder();
         gameBuilder.addPlayer(new Player("foo"));
-        assertEquals(1, gameBuilder.toGame().getPlayers().size());
+        assertEquals(1, gameBuilder.start().getPlayers().size());
         gameBuilder.addPlayer(new Player("foo"));
-        assertEquals(1, gameBuilder.toGame().getPlayers().size());
+        assertEquals(1, gameBuilder.start().getPlayers().size());
     }
 }
