@@ -36,13 +36,8 @@ public class Game {
     public PlayerMove move(Player player, Roll roll) {
         if (!players.contains(player))
             throw new IllegalArgumentException("Player not found: " + player.getName());
-        PlayerMove playerMove = PlayerMove.of(player);
-        do {
-            playerMove.merge(player.move(roll));
-            BouncedSquareFilter.apply(board, playerMove, roll);
-            player.setCurrentSquare(board.getSquares().get(playerMove.getSquare()));
-            if (player.getCurrentSquare() instanceof WinSquare) finished = true;
-        } while (!(player.getCurrentSquare() instanceof CommonSquare) && !finished);
+        PlayerMove playerMove = board.move(player, roll);
+        if (player.getCurrentSquare() instanceof WinSquare) finished = true;
         return playerMove;
     }
 

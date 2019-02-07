@@ -1,5 +1,6 @@
 package io.github.massimosiani.goosegame.domain;
 
+import io.github.massimosiani.goosegame.domain.square.BouncedSquareFilter;
 import io.github.massimosiani.goosegame.domain.square.BridgeSquare;
 import io.github.massimosiani.goosegame.domain.square.CommonSquare;
 import io.github.massimosiani.goosegame.domain.square.GooseSquare;
@@ -37,5 +38,15 @@ public class Board {
 
     public List<Square> getSquares() {
         return new ArrayList<>(squares);
+    }
+
+    public Game.PlayerMove move(Player player, Roll roll) {
+        Game.PlayerMove playerMove = Game.PlayerMove.of(player);
+        do {
+            playerMove.merge(player.move(roll));
+            BouncedSquareFilter.apply(this, playerMove, roll);
+            player.setCurrentSquare(getSquares().get(playerMove.getSquare()));
+        } while (!(player.getCurrentSquare() instanceof CommonSquare) && !(player.getCurrentSquare() instanceof WinSquare));
+        return playerMove;
     }
 }
